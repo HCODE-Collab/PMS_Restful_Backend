@@ -1,6 +1,19 @@
 
 import { IsEnum, IsNotEmpty, IsObject, IsOptional, IsString, Matches } from 'class-validator';
-import { VehicleType, Size } from '@prisma/client';
+// Define enums locally if not exported from @prisma/client
+export enum VehicleType {
+  CAR = 'CAR',
+  TRUCK = 'TRUCK',
+  MOTORCYCLE = 'MOTORCYCLE',
+  // Add other types as needed
+}
+
+export enum Size {
+  SMALL = 'SMALL',
+  MEDIUM = 'MEDIUM',
+  LARGE = 'LARGE',
+  // Add other sizes as needed
+}
 import { Transform } from 'class-transformer';
 
 export class VehicleDto {

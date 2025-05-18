@@ -7,6 +7,7 @@ import { RegisterDto, LoginDto } from '../dtos/auth.dto';
 import { logAction } from '../prisma/prisma-client';
 export class AuthController {
   static async register(req: Request, res: Response) {
+    
     const { name, email, password, role } = req.body as RegisterDto;
     try {
       const userExists = await prisma.user.findUnique({ where: { email } })
@@ -21,14 +22,20 @@ export class AuthController {
       }
 
       const user = await prisma.user.create({
-        data: { name, email, password: hashedPassword, role },
+        data: { 
+          id: crypto.randomUUID(),
+          name, 
+          email, 
+          password: hashedPassword, 
+          role,
+          updatedAt: new Date() // Set updatedAt to current date
+        },
       });
 
       const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, { expiresIn: '1d' });
       await logAction(user.id, 'User registered');
       return ServerResponse.created(res, { user: { id: user.id, name, email, role: user.role }, token });
     } catch (error) {
-      console.log(error);
       return ServerResponse.error(res, 'Internal server error');
     }
   }

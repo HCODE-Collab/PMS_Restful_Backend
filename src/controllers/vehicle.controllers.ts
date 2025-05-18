@@ -4,7 +4,15 @@ import prisma from '../prisma/prisma-client';
 import ServerResponse from '../utils/ServerResponse';
 import { VehicleDto, UpdateVehicleDto } from '../dtos/vehicle.dto';
 import { logAction } from '../prisma/prisma-client';
-import { Prisma, VehicleType } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+
+// Define VehicleType enum locally if not exported by Prisma
+export enum VehicleType {
+  CAR = 'CAR',
+  TRUCK = 'TRUCK',
+  MOTORCYCLE = 'MOTORCYCLE',
+  // Add other vehicle types as needed
+}
 
 export class VehicleController {
   static async createVehicle(req: Request, res: Response) {
@@ -13,8 +21,9 @@ export class VehicleController {
     console.log(plateNumber);
     
     try {
+      const { v4: uuidv4 } = require('uuid');
       const vehicle = await prisma.vehicle.create({
-        data: { userId, plateNumber, vehicleType, size, attributes },
+        data: { id: uuidv4(), userId, plateNumber, vehicleType, size, attributes },
       });
       await logAction(userId, 'Vehicle created');
       return ServerResponse.created(res, vehicle);
@@ -61,7 +70,7 @@ export class VehicleController {
     const pageNum = parseInt(page as string);
     const limitNum = parseInt(limit as string);
 
-    const where: Prisma.VehicleWhereInput = { userId };
+    const where: Prisma.vehicleWhereInput = { userId };
     if (search) {
       const searchStr = search as string;
       const isVehicleType = Object.values(VehicleType).includes(searchStr.toUpperCase() as VehicleType);

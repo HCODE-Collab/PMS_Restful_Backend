@@ -4,16 +4,19 @@ import prisma from '../prisma/prisma-client';
 import ServerResponse from '../utils/ServerResponse';
 import { BulkSlotDto, SlotDto, UpdateSlotDto } from '../dtos/parking.dto';
 import { logAction } from '../prisma/prisma-client';
-import { Prisma, VehicleType, Size } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { VehicleType, Size } from '@prisma/client';
 
+
+// Define enums if not available from @prisma/client
 export class ParkingController {
   static async createBulkSlots(req: Request, res: Response) {
     const userId = (req as any).user.id;
     const { count, prefix, vehicleType, size, location } = req.body as BulkSlotDto;
     const slots = Array.from({ length: count }, (_, i) => ({
       slotNumber: `${prefix}-${i + 1}`,
-      vehicleType,
-      size,
+      vehicleType: vehicleType.toUpperCase() as VehicleType,
+      size: size.toUpperCase() as Size,
       location,
       status: 'AVAILABLE' as const,
     }));
@@ -31,7 +34,14 @@ export class ParkingController {
     const { slotNumber, vehicleType, size, location } = req.body as SlotDto;
     try {
       const slot = await prisma.parkingSlot.create({
-        data: { slotNumber, vehicleType, size, location, status: 'AVAILABLE' },
+        data: { 
+          slotNumber, 
+          vehicleType: vehicleType.toUpperCase() as VehicleType,
+          size: size.toUpperCase() as Size, 
+          location: typeof location === 'string' ? location : location, 
+          status: 'AVAILABLE',
+          // id and updatedAt are omitted so Prisma can auto-generate them
+        },
       });
       await logAction(userId, 'Parking slot created');
       return ServerResponse.created(res, slot);
@@ -51,7 +61,12 @@ export class ParkingController {
     try {
       const updatedSlot = await prisma.parkingSlot.update({
         where: { id },
-        data: { slotNumber, vehicleType, size, location },
+        data: {
+  slotNumber,
+  vehicleType: vehicleType?.toUpperCase() as VehicleType,
+  size: size?.toUpperCase() as Size,
+  location,
+}
       });
       await logAction(userId, 'Parking slot updated');
       return ServerResponse.success(res, updatedSlot);

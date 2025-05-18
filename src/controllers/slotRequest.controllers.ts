@@ -4,7 +4,7 @@ import prisma from '../prisma/prisma-client';
 import ServerResponse from '../utils/ServerResponse';
 import { SlotRequestDto, UpdateSlotRequestDto, ApproveSlotRequestDto, RejectSlotRequestDto } from '../dtos/parking.dto';
 import { sendSlotApprovalEmail } from '../utils/mail';
-import { Prisma, RequestStatus } from '@prisma/client';
+import { Prisma, RequestStatus, VehicleType } from '@prisma/client';
 import { logAction } from '../prisma/prisma-client';
 export class SlotRequestController {
   static async createSlotRequest(req: Request, res: Response) {
@@ -101,7 +101,7 @@ export class SlotRequestController {
       : await prisma.parkingSlot.findFirst({
           where: {
             status: 'AVAILABLE',
-            vehicleType: slotRequest.vehicle.vehicleType,
+            vehicleType: slotRequest.vehicle.vehicleType as VehicleType,
             size: slotRequest.vehicle.size,
           },
         });
@@ -116,7 +116,6 @@ export class SlotRequestController {
         data: {
           status: 'APPROVED',
           slotId: slot.id,
-          slotNumber: slot.slotNumber,
         },
       });
 
@@ -160,7 +159,7 @@ export class SlotRequestController {
     try {
       const updatedSlotRequest = await prisma.slotRequest.update({
         where: { id },
-        data: { status: 'REJECTED', rejectionReason: reason },
+        data: { status: 'REJECTED' },
       });
       await logAction(userId, `Rejected slot request ${id}`);
       return ServerResponse.success(res, updatedSlotRequest);

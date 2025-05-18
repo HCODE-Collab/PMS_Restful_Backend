@@ -1,5 +1,5 @@
 const whitelist = [
-    "http://localhost:8090",
+    "http://localhost:8080",
     // "https://nenodejs-services.vercel.app",
     // "https://nenodejs-backend.onrender.com",
     // "https://nenodejsservices.eu",
@@ -14,7 +14,7 @@ const options = {
     },
     methods: ["GET", "PUT", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token"],
-    credentials: true,
+    credentials: true,  
     exposedHeaders: ["*", "Authorization"]
 };
 

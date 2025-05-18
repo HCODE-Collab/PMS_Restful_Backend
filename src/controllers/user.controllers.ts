@@ -44,7 +44,7 @@ export class UserController {
     const limitNum = parseInt(limit as string);
     const userId = (req as any).user.id;
 
-    const where: Prisma.UserWhereInput = {};
+    const where: Prisma.userWhereInput = {};
     if (search) {
       const searchStr = search as string;
       where.OR = [

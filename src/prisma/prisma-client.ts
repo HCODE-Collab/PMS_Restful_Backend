@@ -18,14 +18,20 @@ if (process.env.NODE_ENV === 'development') {
 
 
 export const logAction = async (userId: string | null, action: string) => {
-  await prisma.log.create({
-    data: {
-      userId,
-      action,
-      createdAt: new Date(),
-    },
-  });
+  try {
+    await prisma.log.create({
+      data: {
+        userId,
+        action,
+      },
+    });
+  } catch (err) {
+    console.error('Log error:', err);
+  }
 };
 
-
 export default prisma;
+
+function uuid(): any {
+  throw new Error('Function not implemented.');
+}
